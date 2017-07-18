@@ -11,14 +11,34 @@ namespace Client
         static void Main(string[] args) =>
             MainAsync(args).GetAwaiter().GetResult();
 
+        const string Usage = "You must pass either 'client' or 'user' as parameter";
+
         static async Task MainAsync(string[] args)
         {
+            if (args.Length != 1)
+            {
+                Console.WriteLine(Usage);
+                return;
+            }
+
             // discover endpoints from metadata
             var disco = await DiscoveryClient.GetAsync("http://localhost:5000");
 
             // request token
-            var tokenClient = new TokenClient(disco.TokenEndpoint, "client", "secret");
-            var tokenResponse = await tokenClient.RequestClientCredentialsAsync("api1");
+            TokenResponse tokenResponse = null;
+
+            switch (args[0].ToLower())
+            {
+                case "client":
+                    tokenResponse = await GetClientCredentialTokenAsync(disco);
+                    break;
+                case "user":
+                    tokenResponse = await GetResourceOwnerCredentialTokenAsync(disco);
+                    break;
+                default:
+                    Console.WriteLine(Usage);
+                    return;
+            }
 
             if (tokenResponse.IsError)
             {
@@ -43,5 +63,21 @@ namespace Client
                 Console.WriteLine(JArray.Parse(content));
             }
         }
+
+        /// <summary>
+        /// Obtains a token representing the whole client
+        /// </summary>
+        static async Task<TokenResponse> GetClientCredentialTokenAsync(DiscoveryResponse discovery) =>
+
+            await new TokenClient(discovery.TokenEndpoint, "client", "secret")
+                .RequestClientCredentialsAsync(scope: "api1");
+
+        /// <summary>
+        /// Obtains a token representing a particular user
+        /// </summary>
+        static async Task<TokenResponse> GetResourceOwnerCredentialTokenAsync(DiscoveryResponse discovery) =>
+
+            await new TokenClient(discovery.TokenEndpoint, "ro.client", "secret")
+                .RequestResourceOwnerPasswordAsync("alice", "password", scope: "api1");
     }
 }
