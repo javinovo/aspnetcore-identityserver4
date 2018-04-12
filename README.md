@@ -1,4 +1,4 @@
-# Experiments with IdentityServer4 [QuickStarts](https://identityserver4.readthedocs.io/en/release/quickstarts/) in ASP.NET Core
+# Experiments with IdentityServer4 [QuickStarts](https://identityserver4.readthedocs.io/en/release/) in ASP.NET Core
 
 Projects
 --------

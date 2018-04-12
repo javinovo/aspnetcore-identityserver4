@@ -16,6 +16,7 @@ namespace IdentityServer
                 .AddTemporarySigningCredential()
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients())
+                //.AddInMemoryIdentityResources()
                 .AddTestUsers(Config.GetUsers().ToList());
                 // adds support for the resource owner password grant
                 // adds support to user related services typically used by a login UI
